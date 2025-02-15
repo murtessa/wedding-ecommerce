@@ -1,0 +1,51 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+# Environment variables
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+debug.log
+error.log
+pm2.log
+pm2-error.log
+
+# Build artifacts
+dist/
+build/
+
+# Database files
+*.sqlite
+*.sqlite-journal
+dump.rdb
+*.lock
+
+# VS Code settings
+.vscode/
+.idea/
+.DS_Store
+
+# React build files
+/frontend/build/
+frontend/node_modules/
+public/assets/
+
+# Ignore uploaded images or media
+/public/uploads/
+backend/uploads/
+
+# OS & system files
+Thumbs.db
+*.swp
+*.swo
+
+# Docker files (if using)
+docker-compose.override.yml
+
+# Git files
+
