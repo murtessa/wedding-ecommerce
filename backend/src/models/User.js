@@ -1,32 +1,81 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 
-const userSchema = new mongoose.Schema(
+// User Roles Enum
+const UserRoles = ["customer", "vendor", "admin", "delivery"];
+
+// Mongoose Schema
+const UserSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      select: false, // Exclude password from queries by default
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
     role: {
       type: String,
-      enum: ["customer", "vendor", "admin"],
-      default: "customer",
+      enum: UserRoles,
+      required: true,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false, // Vendors must be verified by admin
+    },
+    isActive: { type: Boolean, default: true },
+    emailVerificationToken: { type: String },
+    tokenVersion: { type: Number, default: 0 },
+    address: {
+      street: { type: String, default: undefined },
+      city: { type: String, default: undefined },
+      country: { type: String, default: undefined },
+    },
+
+    isEmailVerified: { type: Boolean, default: false },
+    businessInfo: {
+      businessName: { type: String },
+      businessLicense: { type: String }, // Path to uploaded document
+      taxIdentificationNumber: { type: String },
+      location: {
+        latitude: { type: Number, default: undefined },
+        longitude: { type: Number, default: undefined },
+      },
     },
   },
-  { timestamps: true }
+  { timestamps: true } // Automatically adds createdAt and updatedAt
 );
 
-// Hash password before saving
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
+// Hash Password Before Saving
+// UserSchema.pre("save", async function (next) {
+//   if (!this.isModified("password")) return next();
+//   const salt = await bcrypt.genSalt(10);
+//   this.password = await bcrypt.hash(this.password, salt);
+//   next();
+// });
 
-// Match user password for login
-userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
-};
+// Password Comparison Method
+// UserSchema.methods.comparePassword = async function (candidatePassword) {
+//   return bcrypt.compare(candidatePassword, this.password);
+// };
 
-const User = mongoose.model("User", userSchema);
+// Create & Export Model
+const User = mongoose.model("User", UserSchema);
 module.exports = User;
