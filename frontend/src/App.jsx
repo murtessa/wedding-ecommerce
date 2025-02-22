@@ -6,6 +6,8 @@ import Login from "./pages/Login";
 import Header from "./Components/Header";
 import Register from "./pages/Register";
 import CustomerSignup from "./pages/CustomerSignup";
+import ForgetPassword from "./pages/ForgetPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/register" element={<Register />} />
         <Route path="/register/customer" element={<CustomerSignup />} />
+        <Route path="/forgot-password" element={<ForgetPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         {/* <Route path="/register/vendor" element={<VendorRegister />} /> */}
       </Routes>
     </Router>

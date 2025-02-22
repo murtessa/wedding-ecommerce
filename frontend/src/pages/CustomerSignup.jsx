@@ -27,18 +27,17 @@ const CustomerSignup = () => {
   const handlePhoneNumberChange = (e) => {
     let value = e.target.value;
 
-    // If the value starts with "+251", allow the user to type numbers after it
-    if (value.startsWith("+251") && value.length <= 13) {
-      setPhoneNumber(value); // Update state with the new value
-      setValue("phoneNumber", value); // Update react-hook-form state
+    if (!value.startsWith("+251")) {
+      value = "+251";
+    }
+
+    // Allow only numeric input after +251 and limit to 12 characters total
+    if (/^\+251\d{0,9}$/.test(value)) {
+      setPhoneNumber(value);
+      setValue("phoneNumber", value, { shouldValidate: true }); // Sync with react-hook-form
       console.log("Phone number updated:", value);
-    } else if (value === "") {
-      setPhoneNumber("+251"); // Keep "+251" if the field is empty
-      setValue("phoneNumber", "+251"); // Update react-hook-form state
-      console.log("Phone number reset to +251");
     }
   };
-
   useEffect(() => {
     // Load Google's Identity Services Library
     if (window.google) {
@@ -152,21 +151,21 @@ const CustomerSignup = () => {
           </div>
 
           {/* Phone Number */}
-          <div>
+          <div className="mb-4">
             <label className="block text-gray-700 font-semibold">
               Phone Number
             </label>
             <input
               type="text"
-              value={phoneNumber}
-              onChange={handlePhoneNumberChange}
               {...register("phoneNumber", {
                 required: "Phone Number is required",
-                // pattern: {
-                //   value: /^\+251\d{0,9}$/,
-                //   message: "Invalid phone number",
-                // },
+                pattern: {
+                  value: /^\+251\d{9,9}$/, // Ethiopian phone number validation
+                  message: "Invalid phone number format",
+                },
               })}
+              value={phoneNumber}
+              onChange={handlePhoneNumberChange}
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
             {errors.phoneNumber && (
@@ -175,7 +174,6 @@ const CustomerSignup = () => {
               </p>
             )}
           </div>
-
           {/* Password */}
           <div>
             <label className="block text-gray-700 font-semibold">

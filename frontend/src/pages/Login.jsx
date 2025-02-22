@@ -34,14 +34,8 @@ const Login = () => {
         }
       );
 
-      const {
-        accessToken,
-        refreshToken,
-        fullName,
-        role,
-        reactivationRequired,
-        reactivationToken,
-      } = response.data.data;
+      const { accessToken, refreshToken, reactivationRequired } =
+        response.data.data;
 
       if (reactivationRequired) {
         toast.error("Account is deactivated. Reactivation required.");
@@ -122,7 +116,6 @@ const Login = () => {
             )}
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
@@ -131,6 +124,20 @@ const Login = () => {
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
+
+        {/* Forgot Password */}
+
+        <div className="text-right mt-6">
+          <button
+            type="button"
+            className="text-primary text-sm font-italic hover:underline"
+            onClick={() => navigate("/forgot-password")}
+          >
+            Forgot Password?
+          </button>
+        </div>
+
+        {/* Submit Button */}
 
         {/* Divider */}
         <div className="flex items-center justify-center my-4">
