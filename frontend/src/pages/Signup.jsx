@@ -8,9 +8,10 @@ const Signup = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     email: "",
     password: "",
+    phoneNumber: "",
     confirmPassword: "",
   });
 
@@ -19,14 +20,15 @@ const Signup = () => {
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
+    setFormData({ ...formData, [e.target.fullName]: e.target.value });
+    setErrors({ ...errors, [e.target.fullName]: "" });
   };
 
   const validate = () => {
     let newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.fullName.trim()) newErrors.fullName = "Name is required";
     if (!formData.email.includes("@")) newErrors.email = "Enter a valid email";
+
     if (formData.password.length < 6)
       newErrors.password = "Password must be at least 6 characters";
     if (formData.password !== formData.confirmPassword)

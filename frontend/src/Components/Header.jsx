@@ -87,8 +87,8 @@ const Header = () => {
             Login
           </Link>
           <Link
-            to="/signup"
-            className="px-4 py-2 bg-secondary text-white rounded-md hover:bg-primary transition"
+            to="/register"
+            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 transition duration-300"
           >
             Sign Up
           </Link>

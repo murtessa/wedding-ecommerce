@@ -13,15 +13,10 @@ const { sendVerificationEmail } = require("../utils/emailService");
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 
-console.log(process.env.JWT_SECRET);
+// console.log(process.env.JWT_SECRET);
 
 // Generate JWT Token
 const generateToken = (user) => {
-  console.log("JWT_SECRET inside generateToken:", JWT_SECRET);
-
-  if (!JWT_SECRET) {
-    throw new Error("JWT_SECRET is missing! Ensure .env is loaded.");
-  }
   return jwt.sign(
     {
       id: user._id,
@@ -100,11 +95,6 @@ const login = asyncWrapper(async (req, res) => {
   if (!user) {
     throw new AppError("Invalid email or password.", 401);
   }
-
-  // Debugging logs
-  console.log("User:", user);
-  console.log("User Password:", user.password);
-  console.log("Entered Password:", password);
 
   // Check if the email is verified
   if (!user.isEmailVerified) {
