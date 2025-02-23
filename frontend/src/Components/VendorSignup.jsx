@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { FcGoogle } from "react-icons/fc"; // Google Icon
-import { FiEye, FiEyeOff } from "react-icons/fi"; // Eye Icons for password visibility
+import { FcGoogle } from "react-icons/fc";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
-const CustomerSignup = () => {
+const VendorSignup = () => {
   const {
     register,
     handleSubmit,
@@ -19,33 +19,23 @@ const CustomerSignup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
-
-  // State for storing phone number, initialized with +251
   const [phoneNumber, setPhoneNumber] = useState("+251");
 
-  // Handle phone number change and update state
   const handlePhoneNumberChange = (e) => {
     let value = e.target.value;
-
-    if (!value.startsWith("+251")) {
-      value = "+251";
-    }
-
-    // Allow only numeric input after +251 and limit to 12 characters total
+    if (!value.startsWith("+251")) value = "+251";
     if (/^\+251\d{0,9}$/.test(value)) {
       setPhoneNumber(value);
-      setValue("phoneNumber", value, { shouldValidate: true }); // Sync with react-hook-form
-      console.log("Phone number updated:", value);
+      setValue("phoneNumber", value, { shouldValidate: true });
     }
   };
+
   useEffect(() => {
-    // Load Google's Identity Services Library
     if (window.google) {
       window.google.accounts.id.initialize({
         client_id: "YOUR_GOOGLE_CLIENT_ID",
         callback: handleGoogleSignIn,
       });
-
       window.google.accounts.id.renderButton(
         document.getElementById("google-signin-button"),
         { theme: "outline", size: "large" }
@@ -53,19 +43,16 @@ const CustomerSignup = () => {
     }
   }, []);
 
-  // Google Sign-In Callback
   const handleGoogleSignIn = async (response) => {
     setLoading(true);
     setError(null);
     setMessage(null);
-
     try {
       const { credential } = response;
       const res = await axios.post(
         "http://localhost:5000/api/users/google-login",
         { token: credential }
       );
-
       setMessage(res.data.message || "Google Sign-in successful.");
       setTimeout(() => navigate("/dashboard"), 2000);
     } catch (err) {
@@ -75,25 +62,21 @@ const CustomerSignup = () => {
     }
   };
 
-  // Handle Form Submission for Normal Signup
   const onSubmit = async (data) => {
     setLoading(true);
     setError(null);
     setMessage(null);
-
     try {
-      // The phoneNumber field already has the "+251" country code, so it's ready to submit
       const response = await axios.post(
         "http://localhost:5000/api/users/register",
         {
-          role: "customer",
+          role: "vendor",
           fullName: data.fullName,
           email: data.email,
           phoneNumber: data.phoneNumber,
           password: data.password,
         }
       );
-
       setMessage(response.data.message || "Registration successful!");
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
@@ -106,17 +89,15 @@ const CustomerSignup = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Customer Sign Up
+          Vendor Sign Up
         </h2>
 
-        {/* Display messages from backend */}
         {message && (
           <p className="text-green-600 text-center mb-4">{message}</p>
         )}
         {error && <p className="text-red-600 text-center mb-4">{error}</p>}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Full Name */}
           <div>
             <label className="block text-gray-700 font-semibold">
               Full Name
@@ -124,14 +105,13 @@ const CustomerSignup = () => {
             <input
               type="text"
               {...register("fullName", { required: "Full Name is required" })}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
             />
             {errors.fullName && (
               <p className="text-red-500 text-sm">{errors.fullName.message}</p>
             )}
           </div>
 
-          {/* Email */}
           <div>
             <label className="block text-gray-700 font-semibold">Email</label>
             <input
@@ -143,15 +123,14 @@ const CustomerSignup = () => {
                   message: "Invalid email format",
                 },
               })}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
             />
             {errors.email && (
               <p className="text-red-500 text-sm">{errors.email.message}</p>
             )}
           </div>
 
-          {/* Phone Number */}
-          <div className="mb-4">
+          <div>
             <label className="block text-gray-700 font-semibold">
               Phone Number
             </label>
@@ -160,13 +139,13 @@ const CustomerSignup = () => {
               {...register("phoneNumber", {
                 required: "Phone Number is required",
                 pattern: {
-                  value: /^\+251\d{9,9}$/, // Ethiopian phone number validation
+                  value: /^\+251\d{9,9}$/,
                   message: "Invalid phone number format",
                 },
               })}
               value={phoneNumber}
               onChange={handlePhoneNumberChange}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
             />
             {errors.phoneNumber && (
               <p className="text-red-500 text-sm">
@@ -174,7 +153,7 @@ const CustomerSignup = () => {
               </p>
             )}
           </div>
-          {/* Password */}
+
           <div>
             <label className="block text-gray-700 font-semibold">
               Password
@@ -189,61 +168,55 @@ const CustomerSignup = () => {
                     message: "Password must be at least 6 characters",
                   },
                 })}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-3 flex items-center"
+                className="absolute right-3 inset-y-0"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <FiEyeOff /> : <FiEye />}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message}</p>
-            )}
-          </div>
-
-          {/* Confirm Password */}
-          <div>
-            <label className="block text-gray-700 font-semibold">
-              Confirm Password
-            </label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                {...register("confirmPassword", {
-                  required: "Confirm Password is required",
-                  validate: (value) =>
-                    value === watch("password") || "Passwords do not match",
-                })}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-3 flex items-center"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
-              </button>
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-gray-700 font-semibold">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  {...register("confirmPassword", {
+                    required: "Confirm Password is required",
+                    validate: (value) =>
+                      value === watch("password") || "Passwords do not match",
+                  })}
+                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-3 flex items-center"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-sm">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
             </div>
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-sm">
-                {errors.confirmPassword.message}
-              </p>
-            )}
           </div>
 
-          {/* Sign Up Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary text-white font-semibold py-3 rounded-lg hover:bg-opacity-90 transition duration-300"
+            className="w-full bg-primary text-white font-semibold py-3 rounded-lg"
           >
             {loading ? "Registering..." : "Sign Up"}
           </button>
         </form>
-
         {/* OR separator */}
         <div className="flex items-center my-4">
           <hr className="flex-grow border-gray-300" />
@@ -271,4 +244,4 @@ const CustomerSignup = () => {
   );
 };
 
-export default CustomerSignup;
+export default VendorSignup;

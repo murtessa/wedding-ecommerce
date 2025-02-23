@@ -34,7 +34,7 @@ const Register = () => {
 
           {/* Sign up as Vendor */}
           <Link
-            to="/register/vendor"
+            to="/signup"
             className="block bg-white p-6 rounded-lg shadow-md border border-gray-200 
                       hover:border-primary hover:shadow-lg hover:scale-105 transition-transform duration-300"
           >

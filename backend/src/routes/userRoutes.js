@@ -10,7 +10,7 @@ const { protect } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // Customer Registration (One Step)
-router.post("/register/customer", registerCustomer);
+router.post("/register", registerCustomer);
 
 // Vendor Registration (Step 1: Basic Info)
 router.post("/register/vendor/step1", registerVendorStep1);

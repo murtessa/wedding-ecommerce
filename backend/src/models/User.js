@@ -4,6 +4,14 @@ const bcrypt = require("bcrypt");
 // User Roles Enum
 const UserRoles = ["customer", "vendor", "admin", "delivery"];
 
+// Define the Business Info Schema
+const BusinessInfoSchema = new mongoose.Schema({
+  businessName: { type: String, required: true },
+  businessLicense: { type: String, required: true }, // File path for license upload
+  taxIdentificationNumber: { type: String, required: true },
+  additionalDocs: [{ type: String }], // Array to store document paths
+});
+
 // Mongoose Schema
 const UserSchema = new mongoose.Schema(
   {
@@ -51,13 +59,12 @@ const UserSchema = new mongoose.Schema(
 
     isEmailVerified: { type: Boolean, default: false },
     businessInfo: {
-      businessName: { type: String },
-      businessLicense: { type: String }, // Path to uploaded document
-      taxIdentificationNumber: { type: String },
-      location: {
-        latitude: { type: Number, default: undefined },
-        longitude: { type: Number, default: undefined },
-      },
+      type: BusinessInfoSchema,
+      default: null, // Only applicable for vendors
+    },
+    location: {
+      latitude: { type: Number, default: undefined },
+      longitude: { type: Number, default: undefined },
     },
   },
   { timestamps: true } // Automatically adds createdAt and updatedAt

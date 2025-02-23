@@ -34,12 +34,12 @@ const registerCustomer = asyncWrapper(async (req, res) => {
 
   switch (role) {
     case "vendor": {
-      const { businessName, businessAddress, businessLicense } = req.body;
+      const { address, location, businessInfo } = req.body;
       userData = {
         ...userData,
-        businessName,
-        businessAddress,
-        businessLicense,
+        address,
+        location,
+        businessInfo,
         isVerified: false,
       };
       break;
