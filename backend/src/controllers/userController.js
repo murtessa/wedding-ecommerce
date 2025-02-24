@@ -83,9 +83,7 @@ const registerCustomer = asyncWrapper(async (req, res) => {
 
 // Controller for handling vendor verification document uploads
 const uploadVerificationDocs = asyncWrapper(async (req, res, next) => {
-  // Ensure the user exists and is a vendor
-  // const userId = req.user.id;
-  // const user = await User.findById(userId);
+  // Find the user by ID
   const user = await User.findById(req.user._id);
 
   if (!user) {
@@ -98,7 +96,7 @@ const uploadVerificationDocs = asyncWrapper(async (req, res, next) => {
     );
   }
 
-  // Check if files were uploaded
+  // Ensure files were uploaded
   if (!req.files || Object.keys(req.files).length === 0) {
     return next(
       new AppError("No files uploaded. Please upload valid documents.", 400)
@@ -123,13 +121,19 @@ const uploadVerificationDocs = asyncWrapper(async (req, res, next) => {
     );
   }
 
-  // Update the user's businessInfo
+  // Update user's businessInfo with existing businessName
   user.businessInfo = {
-    businessName: user.businessInfo?.businessName || "N/A", // Preserve existing business name if available
-
+    businessName: user.businessName, // Take from previously registered data
     businessLicense,
     taxIdentificationNumber,
     additionalDocs,
+  };
+
+  // Update user's address
+  user.address = {
+    street: req.body.street || user.address?.street || "",
+    city: req.body.city || user.address?.city || "",
+    region: req.body.region || user.address?.region || "",
   };
 
   await user.save();
@@ -139,6 +143,7 @@ const uploadVerificationDocs = asyncWrapper(async (req, res, next) => {
     message: "Vendor verification documents uploaded successfully",
     data: {
       businessInfo: user.businessInfo,
+      address: user.address,
     },
   });
 });

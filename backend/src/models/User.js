@@ -57,7 +57,7 @@ const UserSchema = new mongoose.Schema(
     address: {
       street: { type: String, default: undefined },
       city: { type: String, default: undefined },
-      country: { type: String, default: undefined },
+      region: { type: String, default: undefined },
     },
 
     isEmailVerified: { type: Boolean, default: false },
@@ -72,19 +72,6 @@ const UserSchema = new mongoose.Schema(
   },
   { timestamps: true } // Automatically adds createdAt and updatedAt
 );
-
-// Hash Password Before Saving
-// UserSchema.pre("save", async function (next) {
-//   if (!this.isModified("password")) return next();
-//   const salt = await bcrypt.genSalt(10);
-//   this.password = await bcrypt.hash(this.password, salt);
-//   next();
-// });
-
-// Password Comparison Method
-// UserSchema.methods.comparePassword = async function (candidatePassword) {
-//   return bcrypt.compare(candidatePassword, this.password);
-// };
 
 // Create & Export Model
 const User = mongoose.model("User", UserSchema);

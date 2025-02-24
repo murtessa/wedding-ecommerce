@@ -1,6 +1,6 @@
 import VendorSignup from "../Components/VendorSignup";
 import VendorSignupInfo from "../Components/VendorSignupInfo";
-
+import { Link } from "react-router-dom";
 const VendorSignupPage = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
@@ -19,6 +19,13 @@ const VendorSignupPage = () => {
             className="mt-4 w-40 h-40 object-cover rounded-full shadow-lg"
           />
         </div>
+
+        <Link
+          to="/verify-vendor"
+          className="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 transition duration-300"
+        >
+          Verify docs
+        </Link>
       </div>
     </div>
   );
