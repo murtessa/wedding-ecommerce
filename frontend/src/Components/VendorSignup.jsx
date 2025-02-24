@@ -74,6 +74,7 @@ const VendorSignup = () => {
           fullName: data.fullName,
           email: data.email,
           phoneNumber: data.phoneNumber,
+          businessName: data.businessName,
           password: data.password,
         }
       );
@@ -150,6 +151,29 @@ const VendorSignup = () => {
             {errors.phoneNumber && (
               <p className="text-red-500 text-sm">
                 {errors.phoneNumber.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-semibold">
+              Business Name
+            </label>
+            <input
+              type="text"
+              {...register("businessName", {
+                required: "Business Name is required",
+                maxLength: {
+                  value: 60,
+                  message: "Business Name cannot exceed 60 characters",
+                },
+              })}
+              maxLength={60} // Restricts input to 60 characters
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
+            />
+            {errors.businessName && (
+              <p className="text-red-500 text-sm">
+                {errors.businessName.message}
               </p>
             )}
           </div>

@@ -1,12 +1,15 @@
 const multer = require("multer");
 const path = require("path");
-
 const AppError = require("../utils/appError");
 
-// Storage configuration
+// Storage configuration for general uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Folder where files will be stored
+    if (req.path.includes("upload-profile-picture")) {
+      cb(null, "uploads/profile-pictures/"); // Store profile pictures separately
+    } else {
+      cb(null, "uploads/vendor-verification/"); // Store vendor documents separately
+    }
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -17,15 +20,19 @@ const storage = multer.diskStorage({
       fileType = "image-jpg";
     } else if (file.mimetype.startsWith("image/png")) {
       fileType = "image-png";
-    } else if (file.mimetype === "application/pdf") {
+    } else if (
+      file.mimetype === "application/pdf" &&
+      !req.path.includes("upload-profile-picture")
+    ) {
       fileType = "pdf";
     } else {
-      fileType = "unknown";
-    }
-
-    // Special case for profile pictures
-    if (req.path.includes("upload-profile-picture")) {
-      fileType = "profile";
+      return cb(
+        new AppError(
+          "Only JPG, PNG (for profile), and PDF (for documents) are allowed!",
+          400
+        ),
+        false
+      );
     }
 
     // Generate filename
@@ -33,13 +40,10 @@ const storage = multer.diskStorage({
   },
 });
 
-// Dynamic file filter based on route
+// File filter for different upload types
 const fileFilter = (req, file, cb) => {
-  // Allowed file types for user verifications uploads (PDF, JPEG, PNG)
-  const allowedDocs = ["image/jpeg", "image/png", "application/pdf"];
-
-  // Allowed file types for profile pictures (Only JPEG, PNG)
   const allowedImages = ["image/jpeg", "image/png"];
+  const allowedDocs = ["image/jpeg", "image/png", "application/pdf"];
 
   if (req.path.includes("upload-profile-picture")) {
     // Profile pictures should only be images
@@ -55,34 +59,34 @@ const fileFilter = (req, file, cb) => {
       );
     }
   } else {
-    // General file uploads (verification documents)
+    // General file uploads (vendor verification documents)
     if (allowedDocs.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new AppError("Only JPEG, PNG, and PDF files are allowed!"), false);
+      cb(
+        new AppError("Only JPEG, PNG, and PDF files are allowed!", 400),
+        false
+      );
     }
   }
 };
 
-const uploadVerificationDocsMiddleware = multer({
+// **Multer middleware for vendor verification documents**
+const uploadVendorVerificationDocs = multer({
   storage,
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
 }).fields([
-  // NGO DOCUMENTS
-  { name: "registrationCertificate", maxCount: 1 },
-  { name: "authorizationLetter", maxCount: 1 },
-  { name: "additionalDocs", maxCount: 5 },
-
-  // ORGANIZATION DONOR DOCUMENTS
-  { name: "licenseCertificate", maxCount: 1 },
-  { name: "taxCertificate", maxCount: 1 },
-  { name: "additionalDocs", maxCount: 5 },
-
-  // VOLUNTEER DOCUMENTS
-  { name: "idCard", maxCount: 1 },
-  { name: "trainingCertificate", maxCount: 1 },
+  { name: "businessLicense", maxCount: 1 },
+  { name: "taxIdentificationNumber", maxCount: 1 },
   { name: "additionalDocs", maxCount: 5 },
 ]);
 
-module.exports = uploadVerificationDocsMiddleware;
+// **Multer middleware for profile picture upload**
+const uploadProfilePicture = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit for profile picture
+}).single("profilePicture");
+
+module.exports = { uploadVendorVerificationDocs, uploadProfilePicture };

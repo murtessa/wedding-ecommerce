@@ -34,12 +34,10 @@ const registerCustomer = asyncWrapper(async (req, res) => {
 
   switch (role) {
     case "vendor": {
-      const { address, location, businessInfo } = req.body;
+      const { businessName } = req.body;
       userData = {
         ...userData,
-        address,
-        location,
-        businessInfo,
+        businessName,
         isVerified: false,
       };
       break;
@@ -82,75 +80,70 @@ const registerCustomer = asyncWrapper(async (req, res) => {
 });
 
 // 📌 Vendor Registration - Step 1 (Personal Info)
-const registerVendorStep1 = async (req, res, next) => {
-  try {
-    const { fullName, email, password, phone } = req.body;
 
-    // Check if email exists
-    if (await User.findOne({ email })) {
-      throw new AppError("Email already registered", 400);
-    }
+// Controller for handling vendor verification document uploads
+const uploadVerificationDocs = asyncWrapper(async (req, res, next) => {
+  // Ensure the user exists and is a vendor
+  // const userId = req.user.id;
+  // const user = await User.findById(userId);
+  const user = await User.findById(req.user._id);
 
-    // Hash Password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create Vendor (without business info)
-    const user = await User.create({
-      fullName,
-      email,
-      password: hashedPassword,
-      phone,
-      role: "vendor",
-      isVerified: false, // Vendor requires admin verification
-    });
-
-    sendSuccessResponse(
-      res,
-      201,
-      "Vendor Step 1 completed. Proceed to Step 2.",
-      {
-        userId: user._id,
-      }
-    );
-  } catch (error) {
-    next(error);
+  if (!user) {
+    return next(new AppError("User not found", 404));
   }
-};
 
-// 📌 Vendor Registration - Step 2 (Business Verification)
-const registerVendorStep2 = async (req, res, next) => {
-  try {
-    const {
-      userId,
-      businessName,
-      businessLicense,
-      taxIdentificationNumber,
-      location,
-    } = req.body;
-
-    // Check if user exists
-    const user = await User.findById(userId);
-    if (!user || user.role !== "vendor") {
-      throw new AppError("Invalid vendor account", 400);
-    }
-
-    // Update Vendor with Business Info
-    user.businessInfo = {
-      businessName,
-      businessLicense,
-      taxIdentificationNumber,
-      location,
-    };
-    await user.save();
-
-    sendSuccessResponse(
-      res,
-      200,
-      "Vendor registration completed. Awaiting admin verification."
+  if (user.role !== "vendor") {
+    return next(
+      new AppError("Only vendors can upload verification documents", 403)
     );
-  } catch (error) {
-    next(error);
   }
-};
 
-module.exports = { registerCustomer, registerVendorStep1, registerVendorStep2 };
+  // Check if files were uploaded
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return next(
+      new AppError("No files uploaded. Please upload valid documents.", 400)
+    );
+  }
+
+  // Extract file paths from uploaded files
+  const businessLicense = req.files.businessLicense
+    ? req.files.businessLicense[0].path
+    : null;
+  const taxIdentificationNumber = req.files.taxIdentificationNumber
+    ? req.files.taxIdentificationNumber[0].path
+    : null;
+  const additionalDocs = req.files.additionalDocs
+    ? req.files.additionalDocs.map((file) => file.path)
+    : [];
+
+  // Limit additional documents to 5 files
+  if (additionalDocs.length > 5) {
+    return next(
+      new AppError("You can upload a maximum of 5 additional documents.", 400)
+    );
+  }
+
+  // Update the user's businessInfo
+  user.businessInfo = {
+    businessName: user.businessInfo?.businessName || "N/A", // Preserve existing business name if available
+
+    businessLicense,
+    taxIdentificationNumber,
+    additionalDocs,
+  };
+
+  await user.save();
+
+  res.status(200).json({
+    status: "success",
+    message: "Vendor verification documents uploaded successfully",
+    data: {
+      businessInfo: user.businessInfo,
+    },
+  });
+});
+
+module.exports = {
+  registerCustomer,
+  uploadVerificationDocs,
+};

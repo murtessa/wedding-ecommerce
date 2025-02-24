@@ -48,6 +48,9 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false, // Vendors must be verified by admin
     },
+
+    businessName: { type: String, default: null },
+    profilePicture: { type: String, default: null },
     isActive: { type: Boolean, default: true },
     emailVerificationToken: { type: String },
     tokenVersion: { type: Number, default: 0 },
