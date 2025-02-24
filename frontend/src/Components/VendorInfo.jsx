@@ -1,3 +1,5 @@
+import vendor from "../assets/images/vendor-docs.png";
+
 const VendorInfo = () => {
   return (
     <div className="bg-gray-100 p-6 rounded-lg shadow-md w-full md:w-3/4 mx-auto">
@@ -7,11 +9,7 @@ const VendorInfo = () => {
       <p className="text-gray-600">
         Ensure your business is verified by uploading the necessary documents.
       </p>
-      <img
-        src="/images/vendor-docs.svg"
-        alt="Verification"
-        className="mt-4 w-48 mx-auto"
-      />
+      <img src={vendor} alt="Verification" className="mt-4 w-48 mx-auto" />
     </div>
   );
 };

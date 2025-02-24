@@ -46,6 +46,9 @@ const Login = () => {
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
 
+      // Set Authorization header globally for all axios requests
+      axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+
       toast.success("Login successful! Redirecting...");
       setTimeout(() => navigate("/dashboard"), 1500);
     } catch (err) {
