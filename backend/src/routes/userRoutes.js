@@ -2,6 +2,8 @@ const express = require("express");
 const {
   registerCustomer,
   uploadVerificationDocs,
+  googleAuth,
+  googleAuthCallback,
 } = require("../controllers/userController");
 
 const { uploadVendorVerificationDocs } = require("../middleware/fileUpload");
@@ -20,5 +22,11 @@ router.post(
   uploadVendorVerificationDocs,
   uploadVerificationDocs
 );
+
+router.get("/google", googleAuth);
+router.get("/google/callback", googleAuthCallback);
+
+// router.get("/login/success", loginSuccess);
+// router.get("/logout", logout);
 
 module.exports = router;

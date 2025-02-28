@@ -59,7 +59,7 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/api/auth/google"; // Redirect to backend Google auth
+    window.open("http://localhost:5000/api/users/google", "_self"); // Redirect to backend Google auth
   };
 
   return (

@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
@@ -18,7 +18,7 @@ const VendorSignup = () => {
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState("+251");
 
   const handlePhoneNumberChange = (e) => {
@@ -30,36 +30,11 @@ const VendorSignup = () => {
     }
   };
 
-  useEffect(() => {
-    if (window.google) {
-      window.google.accounts.id.initialize({
-        client_id: "YOUR_GOOGLE_CLIENT_ID",
-        callback: handleGoogleSignIn,
-      });
-      window.google.accounts.id.renderButton(
-        document.getElementById("google-signin-button"),
-        { theme: "outline", size: "large" }
-      );
-    }
-  }, []);
+  const handleGoogleSignup = () => {
+    const role = localStorage.getItem("role") || "vendor"; // Get role from storage
+    console.log("Role:", role); // Corrected syntax for console.log
 
-  const handleGoogleSignIn = async (response) => {
-    setLoading(true);
-    setError(null);
-    setMessage(null);
-    try {
-      const { credential } = response;
-      const res = await axios.post(
-        "http://localhost:5000/api/users/google-login",
-        { token: credential }
-      );
-      setMessage(res.data.message || "Google Sign-in successful.");
-      setTimeout(() => navigate("/dashboard"), 2000);
-    } catch (err) {
-      setError(err.response?.data?.message || "Google sign-in failed");
-    } finally {
-      setLoading(false);
-    }
+    window.location.href = `http://localhost:5000/api/users/google?role=${role}`;
   };
 
   const onSubmit = async (data) => {
@@ -250,7 +225,7 @@ const VendorSignup = () => {
 
         {/* Google Sign-In Button */}
         <button
-          onClick={() => window.google?.accounts.id.prompt()}
+          onClick={handleGoogleSignup}
           className="flex items-center justify-center w-full bg-white text-gray-700 font-semibold py-3 rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-300 shadow-sm"
         >
           <FcGoogle className="text-2xl mr-2" />

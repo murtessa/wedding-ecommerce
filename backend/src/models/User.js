@@ -15,6 +15,7 @@ const BusinessInfoSchema = new mongoose.Schema({
 // Mongoose Schema
 const UserSchema = new mongoose.Schema(
   {
+    googleId: { type: String },
     fullName: {
       type: String,
       required: true,
@@ -29,15 +30,20 @@ const UserSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
       minlength: 6,
       select: false, // Exclude password from queries by default
+      required: function () {
+        return !this.googleId; // Password required only if user is NOT using Google OAuth
+      },
     },
+
     phoneNumber: {
       type: String,
-      required: true,
       unique: true,
       trim: true,
+      required: function () {
+        return !this.googleId; // phone required only if user is NOT using Google OAuth
+      },
     },
     role: {
       type: String,

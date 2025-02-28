@@ -10,6 +10,7 @@ const {
   resetPassword,
   changePassword,
   resendVerificationEmail,
+  checkEmailVerification,
 } = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -21,6 +22,7 @@ router.post("/resend-verification-email", resendVerificationEmail);
 router.post("/refresh-token", refreshToken);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
+router.get("/check-verification", checkEmailVerification);
 
 router.post("/change-password", protect, changePassword);
 

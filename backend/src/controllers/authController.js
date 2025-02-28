@@ -60,6 +60,26 @@ const verifyEmail = asyncWrapper(async (req, res) => {
   sendSuccessResponse(res, 200, "Email verified successfully.");
 });
 
+const checkEmailVerification = asyncWrapper(async (req, res) => {
+  const { email } = req.query; // Get email from query params
+
+  if (!email) {
+    throw new AppError("The Email is Required.", 400);
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new AppError("User not Found.", 404);
+  }
+
+  if (!user.isEmailVerified) {
+    throw new AppError("Email is not Verified", 400);
+  }
+
+  sendSuccessResponse(res, 200, "Email verified  successfully.");
+});
+
 const resendVerificationEmail = asyncWrapper(async (req, res) => {
   const { email } = req.body;
 
@@ -262,4 +282,5 @@ module.exports = {
   resetPassword,
   changePassword,
   resendVerificationEmail,
+  checkEmailVerification,
 };

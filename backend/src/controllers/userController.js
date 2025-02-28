@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const passport = require("passport");
 const crypto = require("crypto");
 
 const sendSuccessResponse = require("../utils/appHelper");
@@ -11,6 +11,31 @@ const {
   sendEmailUpdateVerification,
 } = require("../utils/emailService");
 
+const googleAuth = passport.authenticate("google", {
+  scope: ["profile", "email"],
+});
+
+const googleAuthCallback = passport.authenticate("google", {
+  successRedirect: "http://localhost:3000/dashboard",
+  failureRedirect: "http://localhost:3000/login",
+});
+
+// const loginSuccess = (req, res) => {
+//   if (req.user) {
+//     res.status(200).json({ message: "User logged in", user: req.user });
+//   } else {
+//     res.status(400).json({ message: "Not Authorized" });
+//   }
+// };
+
+// const logout = (req, res, next) => {
+//   req.logout((err) => {
+//     if (err) {
+//       return next(err);
+//     }
+//     res.redirect("http://localhost:3000");
+//   });
+// };
 // Generate JWT Token
 const registerCustomer = asyncWrapper(async (req, res) => {
   const { role, fullName, email, phoneNumber, password } = req.body;
@@ -151,4 +176,6 @@ const uploadVerificationDocs = asyncWrapper(async (req, res, next) => {
 module.exports = {
   registerCustomer,
   uploadVerificationDocs,
+  googleAuthCallback,
+  googleAuth,
 };
