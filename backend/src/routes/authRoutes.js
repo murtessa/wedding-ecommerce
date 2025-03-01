@@ -1,5 +1,6 @@
 const express = require("express");
 const twilio = require("twilio");
+const passport = require("passport");
 
 const {
   login,
@@ -11,6 +12,8 @@ const {
   changePassword,
   resendVerificationEmail,
   checkEmailVerification,
+  googleAuth,
+  googleAuthCallback,
 } = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -25,6 +28,16 @@ router.post("/reset-password", resetPassword);
 router.get("/check-verification", checkEmailVerification);
 
 router.post("/change-password", protect, changePassword);
+
+router.get(
+  "/google",
+  googleAuth,
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+router.get("/google/callback", googleAuthCallback);
+
+// router.get("/login/success", loginSuccess);
+// router.get("/logout", logout);
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;

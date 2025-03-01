@@ -34,7 +34,7 @@ const VendorSignup = () => {
     const role = localStorage.getItem("role") || "vendor"; // Get role from storage
     console.log("Role:", role); // Corrected syntax for console.log
 
-    window.location.href = `http://localhost:5000/api/users/google?role=${role}`;
+    window.location.href = `http://localhost:5000/api/auth/google?role=${role}`;
   };
 
   const onSubmit = async (data) => {

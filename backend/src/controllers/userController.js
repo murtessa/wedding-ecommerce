@@ -1,6 +1,5 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
-const passport = require("passport");
 const crypto = require("crypto");
 
 const sendSuccessResponse = require("../utils/appHelper");
@@ -10,17 +9,6 @@ const {
   sendVerificationEmail,
   sendEmailUpdateVerification,
 } = require("../utils/emailService");
-
-const googleAuth = asyncWrapper(async (req, res, next) => {
-  req.session.role = req.query.role || "vendor"; // Store role in session
-  console.log("Role stored in session 2:", req.session.role);
-  next();
-});
-const googleAuthCallback = passport.authenticate("google", {
-  successRedirect: "http://localhost:3000/dashboard",
-  failureRedirect: "http://localhost:3000/login",
-  session: true,
-});
 
 // const loginSuccess = (req, res) => {
 //   if (req.user) {
@@ -178,6 +166,4 @@ const uploadVerificationDocs = asyncWrapper(async (req, res, next) => {
 module.exports = {
   registerCustomer,
   uploadVerificationDocs,
-  googleAuthCallback,
-  googleAuth,
 };

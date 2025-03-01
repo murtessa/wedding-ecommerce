@@ -3,7 +3,7 @@ require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-
+const passport = require("passport");
 const User = require("../models/User");
 const asyncWrapper = require("../middleware/asyncWrapper");
 const sendSuccessResponse = require("../utils/appHelper");
@@ -14,6 +14,17 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 
 // console.log(process.env.JWT_SECRET);
+
+const googleAuth = asyncWrapper(async (req, res, next) => {
+  req.session.role = req.query.role || "vendor"; // Store role in session
+  console.log("Role stored in session 2:", req.session.role);
+  next();
+});
+const googleAuthCallback = passport.authenticate("google", {
+  successRedirect: "http://localhost:3000/dashboard",
+  failureRedirect: "http://localhost:3000/login",
+  session: true,
+});
 
 // Generate JWT Token
 const generateToken = (user) => {
@@ -283,4 +294,6 @@ module.exports = {
   changePassword,
   resendVerificationEmail,
   checkEmailVerification,
+  googleAuthCallback,
+  googleAuth,
 };
