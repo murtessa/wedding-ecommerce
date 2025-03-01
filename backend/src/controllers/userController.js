@@ -11,13 +11,15 @@ const {
   sendEmailUpdateVerification,
 } = require("../utils/emailService");
 
-const googleAuth = passport.authenticate("google", {
-  scope: ["profile", "email"],
+const googleAuth = asyncWrapper(async (req, res, next) => {
+  req.session.role = req.query.role || "vendor"; // Store role in session
+  console.log("Role stored in session 2:", req.session.role);
+  next();
 });
-
 const googleAuthCallback = passport.authenticate("google", {
   successRedirect: "http://localhost:3000/dashboard",
   failureRedirect: "http://localhost:3000/login",
+  session: true,
 });
 
 // const loginSuccess = (req, res) => {

@@ -1,4 +1,5 @@
 const express = require("express");
+const passport = require("passport");
 const {
   registerCustomer,
   uploadVerificationDocs,
@@ -23,7 +24,11 @@ router.post(
   uploadVerificationDocs
 );
 
-router.get("/google", googleAuth);
+router.get(
+  "/google",
+  googleAuth,
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
 router.get("/google/callback", googleAuthCallback);
 
 // router.get("/login/success", loginSuccess);

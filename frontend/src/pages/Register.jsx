@@ -7,6 +7,8 @@ const Register = () => {
 
   const handleRoleSelection = (role) => {
     localStorage.setItem("role", role); // Store selected role
+    console.log("Redirecting to Google Auth with role:", role);
+
     navigate(`/register/${role}`); // Navigate to the appropriate signup form
   };
 

@@ -11,16 +11,16 @@ passport.use(
       clientID: process.env.CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
       callbackURL: "http://localhost:5000/api/users/google/callback",
-      scope: ["profile", "email"],
-      passReqToCallback: true, // Allows access to req
+      passReqToCallback: true, // Ensures `req` is accessible in the callback
     },
     async (req, accessToken, refreshToken, profile, done) => {
       try {
         let user = await User.findOne({ googleId: profile.id });
 
         if (!user) {
-          // Get role from query params or session storage
-          const role = req.query.role || "vendor"; // Default to "customer" if role not provided
+          // Get role from session, ensure session exists
+          const role = req.session?.role || "vendor";
+          console.log("User Role from Session:", role);
 
           user = new User({
             googleId: profile.id,
@@ -44,12 +44,13 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, { id: user.id, role: user.role }); // Store user ID & role in session
 });
 
-passport.deserializeUser(async (id, done) => {
+passport.deserializeUser(async (obj, done) => {
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(obj.id);
+    if (user) user.role = obj.role; // Restore role from session
     done(null, user);
   } catch (error) {
     done(error, null);
