@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-// import { useNavigate } from "react-router-dom";
+
 import { FcGoogle } from "react-icons/fc";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import Popup from "./Popup";
 
 const VendorSignup = () => {
   const {
@@ -18,8 +19,8 @@ const VendorSignup = () => {
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  // const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState("+251");
+  const [showPopup, setShowPopup] = useState(false);
 
   const handlePhoneNumberChange = (e) => {
     let value = e.target.value;
@@ -31,9 +32,7 @@ const VendorSignup = () => {
   };
 
   const handleGoogleSignup = () => {
-    const role = localStorage.getItem("role") || "vendor"; // Get role from storage
-    console.log("Role:", role); // Corrected syntax for console.log
-
+    const role = localStorage.getItem("role") || "vendor";
     window.location.href = `http://localhost:5000/api/auth/google?role=${role}`;
   };
 
@@ -54,6 +53,7 @@ const VendorSignup = () => {
         }
       );
       setMessage(response.data.message || "Registration successful!");
+      setShowPopup(true);
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
     } finally {
@@ -68,9 +68,6 @@ const VendorSignup = () => {
           Vendor Sign Up
         </h2>
 
-        {message && (
-          <p className="text-green-600 text-center mb-4">{message}</p>
-        )}
         {error && <p className="text-red-600 text-center mb-4">{error}</p>}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -81,7 +78,7 @@ const VendorSignup = () => {
             <input
               type="text"
               {...register("fullName", { required: "Full Name is required" })}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
+              className="w-full p-3 border rounded-lg"
             />
             {errors.fullName && (
               <p className="text-red-500 text-sm">{errors.fullName.message}</p>
@@ -92,14 +89,8 @@ const VendorSignup = () => {
             <label className="block text-gray-700 font-semibold">Email</label>
             <input
               type="email"
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /\S+@\S+\.\S+/,
-                  message: "Invalid email format",
-                },
-              })}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
+              {...register("email", { required: "Email is required" })}
+              className="w-full p-3 border rounded-lg"
             />
             {errors.email && (
               <p className="text-red-500 text-sm">{errors.email.message}</p>
@@ -115,13 +106,13 @@ const VendorSignup = () => {
               {...register("phoneNumber", {
                 required: "Phone Number is required",
                 pattern: {
-                  value: /^\+251\d{9,9}$/,
+                  value: /^\+251\d{9}$/,
                   message: "Invalid phone number format",
                 },
               })}
               value={phoneNumber}
               onChange={handlePhoneNumberChange}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
             {errors.phoneNumber && (
               <p className="text-red-500 text-sm">
@@ -129,7 +120,6 @@ const VendorSignup = () => {
               </p>
             )}
           </div>
-
           <div>
             <label className="block text-gray-700 font-semibold">
               Business Name
@@ -138,13 +128,8 @@ const VendorSignup = () => {
               type="text"
               {...register("businessName", {
                 required: "Business Name is required",
-                maxLength: {
-                  value: 60,
-                  message: "Business Name cannot exceed 60 characters",
-                },
               })}
-              maxLength={60} // Restricts input to 60 characters
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
+              className="w-full p-3 border rounded-lg"
             />
             {errors.businessName && (
               <p className="text-red-500 text-sm">
@@ -160,14 +145,8 @@ const VendorSignup = () => {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters",
-                  },
-                })}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary"
+                {...register("password", { required: "Password is required" })}
+                className="w-full p-3 border rounded-lg"
               />
               <button
                 type="button"
@@ -177,34 +156,29 @@ const VendorSignup = () => {
                 {showPassword ? <FiEyeOff /> : <FiEye />}
               </button>
             </div>
-            {/* Confirm Password */}
-            <div>
-              <label className="block text-gray-700 font-semibold">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  {...register("confirmPassword", {
-                    required: "Confirm Password is required",
-                    validate: (value) =>
-                      value === watch("password") || "Passwords do not match",
-                  })}
-                  className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-3 flex items-center"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
-                </button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-sm">
-                  {errors.confirmPassword.message}
-                </p>
-              )}
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-semibold">
+              Confirm Password
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                {...register("confirmPassword", {
+                  required: "Confirm Password is required",
+                  validate: (value) =>
+                    value === watch("password") || "Passwords do not match",
+                })}
+                className="w-full p-3 border rounded-lg"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-3"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
             </div>
           </div>
 
@@ -216,20 +190,18 @@ const VendorSignup = () => {
             {loading ? "Registering..." : "Sign Up"}
           </button>
         </form>
-        {/* OR separator */}
+
         <div className="flex items-center my-4">
           <hr className="flex-grow border-gray-300" />
           <span className="mx-3 text-gray-500">OR</span>
           <hr className="flex-grow border-gray-300" />
         </div>
 
-        {/* Google Sign-In Button */}
         <button
           onClick={handleGoogleSignup}
           className="flex items-center justify-center w-full bg-white text-gray-700 font-semibold py-3 rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-300 shadow-sm"
         >
-          <FcGoogle className="text-2xl mr-2" />
-          Sign in with Google
+          <FcGoogle className="text-2xl mr-2" /> Sign in with Google
         </button>
 
         <p className="text-center text-gray-600 mt-4">
@@ -239,6 +211,10 @@ const VendorSignup = () => {
           </a>
         </p>
       </div>
+
+      {showPopup && (
+        <Popup message={message} onClose={() => setShowPopup(false)} />
+      )}
     </div>
   );
 };
